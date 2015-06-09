@@ -1,131 +1,259 @@
 package
 {
 	import flash.display.Bitmap;
+	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
-
-/**
-* ...  
-* @author niels
-*/
+	import flash.media.Sound;
+	import flash.media.SoundChannel;
+	import flash.net.URLRequest;
+	
+	/**
+	 * ...
+	 * @author niels
+	 */
 	public class mainMenu extends Sprite
 	{
+		//music
+		private var menuTheme:Sound;
+		//private var buttonClick:Sound;
+		private var soundChannel:SoundChannel
+		
+		private var startScerm:WinterIsComingMenuArt;
+		
 		private var main:Main;
 		
 		[Embed(source="../lib/bg.png")]
 		private var BackgroundImage:Class;
 		private var bgImage:Bitmap;
 		
-		[Embed(source="../lib/buttons/back.png")]
-		private var backImage:Class;
-		private var bImage:Bitmap
-		 
-		[Embed(source="../lib/HowTo.jpg")]
-		private var BackHowImage:Class;
-		private var bhImage:Bitmap;
+		private var startButton:StartButtonArt;
+		private var backButton:BackButtonArt;
+		private var cursor:Cursor;
 		
-		[Embed(source="../lib/buttons/start.png")]
-		private var startImage:Class;
-		private var sImage:Bitmap;
+		private var creditScreen:CreditsScreenArt;
+		private var creditButton:CreditsButtonArt;
 		
-		[Embed(source="../lib/buttons/start_licht.png")]
-		private var startLightImage:Class;
-		private var slImage:Bitmap;
+		private var htpButton:HowToPlayArt;
+		private var htpScreen:howToPlayScreenArt;
 		
+		private var snowMenuButton:SnowArtButton;
+		private var forrestMenuButton:ForrestArtButton;
 		
-		[Embed(source="../lib/buttons/how to play.png")]
-		private var howToPlayImage:Class;
-		private var hImage:Bitmap;
+		private var backgroundSnow:MovieClip;
+		private var backgroundForrest:MovieClip;
 		
-		[Embed(source="../lib/buttons/how to play_licht.png")]
-		private var howToPlayLightImage:Class;
-		private var hlImage:Bitmap;
+		public static var forrestStyle:Boolean;
+		private var toRemoveScreen:int;
 		
-			public function mainMenu():void
+		private var easterEggCounter:int;
+		private var eastereggArt:MovieClip;
+		
+		public function mainMenu():void
+		{
+			if (stage)
+				init();
+			else
+				addEventListener(Event.ADDED_TO_STAGE, init);
+		}
+		
+		private function init(e:Event = null):void
+		{
+			menuTheme = new Sound();
+			menuTheme.load(new URLRequest("../lib/sound/menutheme.mp3"));
+			
+			backgroundForrest = new blurForestLevelArt();
+			backgroundForrest.width = 0;
+			addChild(backgroundForrest);
+			backgroundSnow = new blurIceLevelArt();
+			addChild(backgroundSnow);
+			
+			forrestMenuButton = new ForrestArtButton();
+			forrestMenuButton.x = 650, forrestMenuButton.y = 550;
+			addChild(forrestMenuButton);
+			
+			snowMenuButton = new SnowArtButton();
+			snowMenuButton.x = 650, snowMenuButton.y = 550;
+			snowMenuButton.width = 0;
+			addChild(snowMenuButton);
+			
+			eastereggArt = new Easteregg();
+			eastereggArt.alpha = 0;
+			eastereggArt.x = 250;
+			addChild(eastereggArt);
+			
+			creditScreen = new CreditsScreenArt();
+			creditScreen.x = 640;
+			creditScreen.y = 360;
+			
+			backButton = new BackButtonArt();
+			backButton.x = 1100;
+			backButton.y = 100;
+			
+			startButton = new StartButtonArt();
+			startButton.x = 340;
+			startButton.y = 200;
+			addChild(startButton);
+			
+			htpButton = new HowToPlayArt();
+			htpButton.x = 440;
+			htpButton.y = 320;
+			addChild(htpButton);
+			
+			htpScreen = new howToPlayScreenArt();
+			htpScreen.x = stage.width / 2;
+			htpScreen.y = stage.height / 2;
+			
+			creditButton = new CreditsButtonArt();
+			creditButton.x = 540;
+			creditButton.y = 400;
+			addChild(creditButton);
+			
+			startScerm = new WinterIsComingMenuArt();
+			startScerm.alpha = 2;
+			startScerm.x = 640;
+			startScerm.y = 360;
+			addChild(startScerm);
+			
+			//addChildAt(cursor, numChildren - 1);
+			cursor = new Cursor();
+			addChild(cursor);
+			
+			stage.addEventListener(MouseEvent.CLICK, start);
+		
+		}
+		
+		private function loop(e:Event):void
+		{
+			startScerm.alpha -= 0.02;
+			
+			if (startScerm.alpha == 0)
 			{
-				
-				if (stage) init();
-				else addEventListener(Event.ADDED_TO_STAGE, init);
-				
+				removeChild(startScerm);
+				startScerm = null;
+				removeEventListener(Event.ENTER_FRAME, loop);
 			}
-			
-			private function init(e:Event = null):void
-			{				
-				bgImage = new BackgroundImage();
-				addChild(bgImage);
-				
-				bhImage = new BackHowImage;
-				
-				bImage = new backImage;
-				bImage.x = 500;
-				bImage.y = 500;
-				
-				sImage = new startImage();
-				sImage.x = 340;
-				sImage.y = 250;
-				
-				slImage = new startLightImage();
-				slImage.x = 340;
-				slImage.y = 250;
-				
-			
-				addChild(sImage);
-				
-				
-				hImage = new howToPlayImage();
-				hImage.x = 235;
-				hImage.y = 150;
-				
-				hlImage = new howToPlayLightImage();
-				hlImage.x = 235;
-				hlImage.y = 150;
-	
-				addChild(hImage);
-			
-				
-				
+		}
+		
+		//checks if clicked on start screen
+		public function start(e:MouseEvent):void
+		{
+			if (startScerm.hitTestPoint(mouseX, mouseY))
+			{
+				stage.addEventListener(Event.ENTER_FRAME, loop);
 				stage.addEventListener(MouseEvent.CLICK, msDown);
+				stage.removeEventListener(MouseEvent.CLICK, start);
+				soundChannel = menuTheme.play(0, 0.5);
+			}
+		}
+		
+		public function msDown(e:MouseEvent):void
+		{
+			//checks for art style button
+			if (forrestMenuButton.hitTestPoint(mouseX, mouseY) || snowMenuButton.hitTestPoint(mouseX, mouseY))
+			{
+				//trace(snowStyleTrue);
+				if (easterEggCounter > 15) eastereggArt.alpha = 1;
+				if (!forrestStyle)
+				{
+					forrestMenuButton.width = 0;
+					snowMenuButton.width = 200;
+					
+					backgroundForrest.width = 1280;
+					backgroundSnow.width = 0;
+					
+					easterEggCounter++;
+					
+					forrestStyle = true;
+				}
+				else if (forrestStyle)
+				{
+					snowMenuButton.width = 0;
+					forrestMenuButton.width = 200;
+					
+					backgroundSnow.width = 1280;
+					backgroundForrest.width = 0;
+					
+					easterEggCounter++;
+					
+					forrestStyle = false;
+				}
+			}
+			
+			//Checks if start button is clicked
+			if (startButton.parent && htpButton.parent && creditButton.parent && startButton.hitTestPoint(mouseX, mouseY))
+			{
+				removeEventListener(Event.ADDED_TO_STAGE, init);
+				removeChild(startButton);
+				removeChild(htpButton);
+				removeChild(creditButton);
+				removeChild(forrestMenuButton);
+				removeChild(snowMenuButton);
+				removeChild(backgroundForrest);
+				removeChild(backgroundSnow);
+				removeChild(eastereggArt);
+				
+				stage.removeEventListener(MouseEvent.CLICK, msDown);
+				
+				soundChannel.stop();
+				
+				main = new Main();
+				addChild(main);
+			}
+			
+			//checks if how to play button is clicked
+			if (startButton.parent && htpButton.parent && creditButton.parent && htpButton.hitTestPoint(mouseX, mouseY))
+			{
+				removeChild(startButton);
+				removeChild(htpButton);
+				removeChild(creditButton);
+				removeChild(forrestMenuButton);
+				removeChild(snowMenuButton);
+				removeChild(cursor);
+				
+				toRemoveScreen = 1;
+				
+				addChild(htpScreen);
+				addChild(backButton);
+				addChild(cursor);
 				
 			}
 			
-			public function msDown(e:MouseEvent):void
+			//checks if credids button is clicked 
+			if (startButton.parent && htpButton.parent && creditButton.parent && creditButton.hitTestPoint(mouseX, mouseY))
 			{
-				if(sImage.hitTestPoint(mouseX,mouseY))
-				{
-					removeEventListener(Event.ADDED_TO_STAGE, init);
-					removeChild(sImage);
-					removeChild(hImage);
-					
-					sImage = null;
-					hImage = null;
-					bImage = null;
-					
-					main = new Main();
-					addChild(main);
-					stage.removeEventListener(MouseEvent.CLICK, msDown);
-				}
-				else {
-					if(hImage.hitTestPoint(mouseX,mouseY))
-					{
-						removeEventListener(Event.ADDED_TO_STAGE, init);
-						removeChild(sImage);
-						removeChild(hImage);
-								
-						addChild(bhImage);	
-						addChild(bImage);
-					}
-					else {
-						if(bImage.hitTestPoint(mouseX,mouseY))
-						{
-							removeChild(bhImage);
-							removeChild(bImage);
-							
-							addChild(sImage);
-							addChild(hImage);
-						}
-					}
-				}
+				removeChild(startButton);
+				removeChild(htpButton);
+				removeChild(creditButton);
+				removeChild(forrestMenuButton);
+				removeChild(snowMenuButton);
+				removeChild(cursor);
+				
+				toRemoveScreen = 2;
+				
+				addChild(cursor);
+				addChild(creditScreen);
+				addChild(backButton);
 			}
+			
+			//checks if back button is clicked
+			if (backButton.parent && backButton.hitTestPoint(mouseX, mouseY))
+			{
+				removeChild(backButton);
+				removeChild(cursor);
+				if (toRemoveScreen == 1) removeChild(htpScreen);
+				else removeChild(creditScreen);
+				
+				addChild(startButton);
+				addChild(htpButton);
+				addChild(creditButton);
+				addChild(forrestMenuButton);
+				addChild(snowMenuButton);
+				addChild(cursor);
+			}
+		
+		}
+	
 	}
 }

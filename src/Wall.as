@@ -1,29 +1,40 @@
-package  
+package
 {
-	import flash.display.Bitmap;
+	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.events.Event;
-	import flash.events.MouseEvent;
+	
 	/**
 	 * ...
 	 * @author Daniël Brand
 	 */
 	public class Wall extends Sprite
 	{
-		public var radius:int = 40;
-		[Embed(source="../lib/Tree_Level1.png")]
+		public var radius:int;
 		private var wall:Class;
-		private var treeImage:Bitmap;
+		private var treeImage:MovieClip;
+		private var treeImage2:MovieClip;
+		public static var wallRandomArt:Boolean;
 		
-		public function Wall() 
+		public function Wall()
 		{
-			treeImage = new wall();
-			this.addChild(treeImage);
+			treeImage = new TreeArt();
+			treeImage2 = new SnowTreeArt();
 			
-			this.x = 950;
-			this.y = 300;
+			radius = width / 2;
+			addEventListener(Event.ADDED_TO_STAGE, init)
 		}
 		
+		public function init(e:Event):void
+		{
+			if (wallRandomArt == false)
+				addChild(treeImage);
+			if (wallRandomArt == true)
+				addChild(treeImage2);
+			
+			removeEventListener(Event.ADDED_TO_STAGE, init);
+		}
+	
 	}
 
 }

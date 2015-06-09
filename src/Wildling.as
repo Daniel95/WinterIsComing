@@ -1,36 +1,60 @@
 package  
 {
 	import flash.events.Event;
-	import flash.events.TouchEvent;
-	import flash.utils.Timer;
 	import flash.events.TimerEvent;
+	import flash.utils.Timer;
 	/**
 	 * ...
 	 * @author Daniël Brand
 	 */
-	public class Wildling extends FollowBase
-	{
-		private var shootTimer:Timer;
-		public var speedX:int;
-		public var speedY:int;
-		private var turnToPlayAtStart:Boolean;
+	public class Wildling extends MoveInScreenBase
+	{	
+		public var radius:int;
 		
-		public function Wildling() 
-		{
-			character = new PlayerArt();
+		private var randomAttack:Number;
+		
+		private var shootCD:int;
+		
+		private var shootTimer:Timer;
+		
+		public function Wildling(score:int) 
+		{	
+			character = new SkeletionBoogArt();
 			this.addChild(character);
 			
-			this.scaleX = this.scaleY = 0.2;
+			var random:Number = Math.random();
 			
-			shootTimer = new Timer(2000+Math.random()*2600);
-			shootTimer.addEventListener(TimerEvent.TIMER, shoot);
+			var randomAttack:Number = random;
+			
+			rotateSpeed += score / 200;
+			
+			if (randomAttack > 0.25) {
+				lives = Math.ceil(random * 2) + score / 40;
+				shootCD = 2200 - score;
+				this.scaleX = this.scaleY = size = 0.35;
+			}
+			else {
+				lives = Math.ceil(random * 4) + score / 50;
+				isMage = true;
+				shootCD = 4000 - score;
+				size = 0.3;
+				this.scaleX = this.scaleY = size = 0.30;
+			}
+			
+			radius = width / 3;
+			
+			meleeDamage = (score / 25) + 1;
+			
 			this.addEventListener(Event.ADDED_TO_STAGE, init);
-			shootTimer.start();
 		}
 		private function init(e:Event):void 	
 		{
 			removeEventListener(Event.ADDED_TO_STAGE, init);
-			lives = Math.ceil(Math.random() * 2);
+			
+			shootTimer = new Timer(shootCD+Math.random()*2600);
+			shootTimer.addEventListener(TimerEvent.TIMER, shoot);
+			shootTimer.start();
+			
 			this.addEventListener(Event.ENTER_FRAME, loop);
 		}
 		
@@ -42,30 +66,15 @@ package
 		}
 		override public function loop(e:Event):void
 		{
-			if (Main.player != null)
-			{
-				//speedx and speedy get a value depending on where they spawn
-				if (this.x < 540) speedX = 1;
-				else speedX = -1;
-				if (this.y < 360) speedY = 1;
-				else speedY = -1;
-				
-				//if not in the field, this objects moves
-				if(this.x > 1024 || this.x < 100 || this.y > 620 || this.y < 100)
-				{
-					this.x += speedX;
-					this.y += speedY;
-					if (turnToPlayAtStart == false && this.x > 400)
-					{
-						this.rotation = 180;
-						turnToPlayAtStart = true;
-					}
-				}
-				
-				targetPosition.x = Main.player.x - this.x;
-				targetPosition.y = Main.player.y - this.y;
-				
-				super.loop(e);
+			super.loop(e);
+			if (dead) {
+				lives = 1;
+					
+				if (waitForAnim > 0){
+					character.alpha -= 0.1;
+					character.scaleX = character.scaleY -= 0.02;
+					waitForAnim--;
+				}else toRemove = true;
 			}
 		}
 		override public function destroy():void
@@ -73,9 +82,8 @@ package
 			shootTimer.removeEventListener(TimerEvent.TIMER, shoot);
 			shootTimer.stop();
 			shootTimer = null;
+			this.removeEventListener(Event.ENTER_FRAME, loop);
 			super.destroy();
 		}
-		
 	}
-
 }

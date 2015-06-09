@@ -1,54 +1,57 @@
-package  
+package
 {
 	
-	import flash.display.MovieClip;
 	import flash.events.Event;
+	
 	/**
 	 * ...
-	 * @author Daniël Brand
+	 * @author Daniël Brands
 	 */
-	public class Walker extends FollowBase
+	public class Walker extends MoveForwardBase
 	{
 		public var moveSpeed:Number = (Math.random() * 2) + 1.2;
-		public function Walker()
+		public var radius:int;
+		
+		public function Walker(score:int)
 		{
-   			character = new WalkerArt();
+			character = new WalkerArt();
 			this.addChild(character);
 			
-			this.scaleX = this.scaleY = (Math.random() / 7) + 0.25;
+			var random:Number = Math.random();
 			
-			this.addEventListener(Event.ADDED_TO_STAGE, init);
-		}		
-		private function init(e:Event):void 	
-		{
-			lives = Math.ceil(Math.random() * 3);
-			speed = (Math.random() * 2) + 1.2;
+			this.scaleX = this.scaleY = size = (random * 0.05) + 0.4;
+			
+			rotateSpeed += score / 200;
+			lives = Math.ceil(random * 3) + score / 40;
+			speed = (random * 2) + 0.75 + (score / 50);
+			radius = width / 3;
+			meleeDamage = (score / 25) + 1;
+			
 			this.addEventListener(Event.ENTER_FRAME, loop);
-			removeEventListener(Event.ADDED_TO_STAGE, init);
 		}
 		
-		override public function loop(e:Event):void 
+		override public function loop(e:Event):void
 		{
 			if (Main.player != null)
-			{	
-				
-				//Giving the rotation to main script
-				targetPosition.x = Main.player.x - this.x;
-				targetPosition.y = Main.player.y - this.y;
-				
-				var b:Number = this.rotation * Math.PI/180;
-				this.x += speed * Math.cos(b);
-				this.y += speed * Math.sin(b);
-				
-				speed += 0.000001;
-				
+			{
 				super.loop(e);
+				if (dead)
+				{
+					lives = 1;
+						
+					if (waitForAnim > 0){
+						character.alpha -= 0.1;
+						character.scaleX = character.scaleY -= 0.02;
+						waitForAnim--;
+					}else toRemove = true;	
+				}
 			}
 		}
 		
 		override public function destroy():void
 		{
-			super.destroy();//zo voer je ook alle anderen taken in een functie uit(die in de functie zitten die ik override)
+			this.removeEventListener(Event.ENTER_FRAME, loop);
+			super.destroy(); //zo voer je ook alle anderen taken in een functie uit(die in de functie zitten die ik override)
 		}
 	}
 }
