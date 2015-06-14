@@ -16,7 +16,7 @@ package
 		
 		public function score():void
 		{
-			this.text = "Pickups: " + _upgradeScore + "            " + _summonersSpawned;
+			this.text = "Pickups: " + _upgradeScore + "      Boss: " + _summonersSpawned;
 		}
 		
 		public function ScoreBoard()
@@ -29,8 +29,8 @@ package
 			removeEventListener(Event.ADDED_TO_STAGE, init);
 			this.defaultTextFormat = new TextFormat("font", 30, 0xd3b14d, true);
 			this.width = stage.stageWidth;
-			this.x = 1002;
-			this.text = "Pickups: " + _upgradeScore + "            " + _summonersSpawned;
+			this.x = 880;
+			this.text = "Pickups: " + _upgradeScore + "      Boss: " + _summonersSpawned;
 		}
 	
 	}

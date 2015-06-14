@@ -32,12 +32,14 @@ package
 		private var runAnim:Boolean;
 		
 		//UI
-		public var barLives:int //makes the playerhealth available for Bars script
+		//public var barLives:int //makes the playerhealth available for Bars script
 		
 		//Sound
 		private var damage:Sound;
 		private var nearDead:Sound;
-		private var bowPull:Sound;
+		private var bowPull1:Sound;
+		private var bowPull2:Sound;
+		private var bowPull3:Sound;
 		private var arrowShoot:Sound;
 		private var soundChannel:SoundChannel;
 		
@@ -91,8 +93,15 @@ package
 			arrow = new ArrowArt();
 			arrow.scaleX = arrow.scaleY = 0.1;
 			
-			bowPull = new Sound();
-			bowPull.load(new URLRequest("../lib/sound/bowpull1.mp3"));
+			bowPull1 = new Sound();
+			bowPull1.load(new URLRequest("../lib/sound/bowpull1.mp3"));
+			
+			bowPull2 = new Sound();
+			bowPull2.load(new URLRequest("../lib/sound/bowpull2.mp3"));
+			
+			
+			bowPull3 = new Sound();
+			bowPull3.load(new URLRequest("../lib/sound/bowpull3.mp3"));
 			
 			damage = new Sound();
 			damage.load(new URLRequest("../lib/sound/damage.mp3"));
@@ -104,7 +113,7 @@ package
 			
 			isPlayer = true;
 			
-			lives = 20;
+			lives = 25;
 			
 			this.addEventListener(Event.ADDED_TO_STAGE, init);
 		}
@@ -128,16 +137,14 @@ package
 			if (!soundEffectsOff)
 			{
 				var r:Number = Math.random();
-				bowPull = new Sound();
 				if (r < 0.33)
 				{
-					bowPull.load(new URLRequest("../lib/sound/bowpull1.mp3"));
+					soundChannel = bowPull1.play(0, 1);
 				}
 				else if (r < 0.77)
-					bowPull.load(new URLRequest("../lib/sound/bowpull2.mp3"));
+					soundChannel = bowPull2.play(0, 1);
 				else
-					bowPull.load(new URLRequest("../lib/sound/bowpull3.mp3"));
-				soundChannel = bowPull.play(0, 1);
+					soundChannel = bowPull3.play(0, 1);
 			}
 		}
 		
@@ -152,7 +159,6 @@ package
 				{
 					if (arrow != null)
 						this.removeChild(arrow);
-					//this.removeChildAt(numChildren-2);
 					var se:ShootEvent = new ShootEvent("onShoot");
 					se.shooter = this;
 					dispatchEvent(se);
@@ -284,7 +290,7 @@ package
 				transformY += speed; // move down if keyDown is true
 			
 			//gegevens doorgeven aan anderen scripts
-			barLives = lives;
+			//barLives = lives;
 			
 			dmgCD--;
 			
@@ -308,7 +314,7 @@ package
 					transformY -= 7;
 				if (!soundEffectsOff)
 					soundChannel = damage.play(0, 1);
-					if(lives < 5) soundChannel = nearDead.play(0, 1);
+					if(lives <= 10) soundChannel = nearDead.play(0, 1);
 			}
 		}
 		

@@ -2,6 +2,7 @@ package
 {
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
+	import flash.media.SoundTransform;
 	//import flash.display.DisplayObject;
 	import flash.events.Event;
 	import flash.events.KeyboardEvent;
@@ -28,6 +29,7 @@ package
 		private var growl2:Sound;
 		private var summonerComing:Sound;
 		private var soundChannel:SoundChannel;
+		private var musicChanel:SoundChannel = new SoundChannel;
 		private var growlCD:int = 200;
 		
 		//characters
@@ -69,7 +71,7 @@ package
 		private var spawnRate:Number = 1; //The speed at wich the counter goes
 		private var SkeletonCount:int = 0; //keeps track of the amound of skellentons
 		private var _timesSumSpawned:int;
-		private var _maxSkelentons:int = 3;
+		private var _maxSkelentons:int = 2;
 		
 		//Booleans
 		private var SummonerActive:Boolean; //checks if the summoner is active
@@ -124,7 +126,9 @@ package
 			
 			inGameTheme = new Sound();
 			inGameTheme.load(new URLRequest("../lib/sound/soundtrack_inGame.mp3"));
-			soundChannel = inGameTheme.play(0, 10);
+			musicChanel = inGameTheme.play(0, 10);
+			
+			//soundChannel.stop();
 			
 			gameOverTheme = new Sound();
 			gameOverTheme.load(new URLRequest("../lib/sound/soundtrack_die.mp3"));
@@ -192,7 +196,6 @@ package
 			addChild(cursor);
 			
 			this.addEventListener(Event.ENTER_FRAME, loop);
-			stage.addEventListener(KeyboardEvent.KEY_DOWN, OnKeyDown);
 			stage.addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
 		}
 		
@@ -200,11 +203,9 @@ package
 		{
 			if (player != null)
 			{
-				//player.lives = 4;
 				if (bars.chooseUpgrades > 0)
 				{
 					UpgradeMenu.alpha += 0.01;
-					//player.skillPoint();
 					if (bars.upgrade == 1)
 						player.lives += 3, bars.upgrade = 0, bars.chooseUpgrades--, scoreboard._upgradeScore--, scoreboard.score(), bars.bars();
 					if (bars.upgrade == 2)
@@ -249,7 +250,7 @@ package
 				if (!SummonerActive)
 				{
 					spawnSummoner();
-					if (_maxSkelentons <= 15) _maxSkelentons += 3;
+					if (_maxSkelentons <= 15) _maxSkelentons += 2;
 					
 					_timesSumSpawned++, scoreboard._summonersSpawned++, scoreboard._score++, scoreboard.score();
 				}
@@ -257,8 +258,8 @@ package
 				{
 					if (SkeletonCount <= _maxSkelentons) spawnSkeletons();
 					
-					if (_timesSumSpawned < 4) screenShake(_timesSumSpawned * 2);
-					else screenShake(8);
+					if (_timesSumSpawned < 2) screenShake(_timesSumSpawned * 2);
+					else screenShake(4);
 				}
 			}
 		}
@@ -266,9 +267,9 @@ package
 		//spawnEnemies
 		private function spawnEnemies():void
 		{
-			if (spawnCounter >= 160 && !SummonerActive)
+			if (spawnCounter >= 180 && !SummonerActive)
 			{
-				if (Math.random() < 0.6)
+				if (Math.random() < 0.65)
 				{
 					//------spawns a walker------
 					enemy = new Walker(scoreboard._score);
@@ -298,7 +299,7 @@ package
 					enemyCounter++;
 				}
 				spawnCounter = 0;
-				spawnRate += 0.01;
+				spawnRate += 0.005;
 			}
 			else
 				spawnCounter += spawnRate;
@@ -317,8 +318,7 @@ package
 			
 			SummonerActive = true;
 			
-			if (!player.soundEffectsOff)
-				soundChannel = summonerComing.play(0, 1);
+			if (!player.soundEffectsOff) soundChannel = summonerComing.play(0, 1);
 		}
 		
 		private function spawnSkeletons():void
@@ -394,7 +394,6 @@ package
 				//collision player with wall
 				if (player.hitTestObject(walls[wl]) && Maths.hitTest(player, walls[wl]) == true)
 				{
-					//trace("collided");
 					direction = Maths.fromAngleToPos(Maths.fromPosToAngle(walls[wl], player) - 90);
 					
 					player.x = walls[wl].x + (direction.x * -1) * (player.radius + walls[wl].radius);
@@ -464,7 +463,7 @@ package
 							if (enemies[k] is Skeleton == false)
 							{
 								//handles enemy deaths
-								if (Math.random() < 0.35)
+								if (Math.random() < 0.23)
 								{
 									var pickUp:PickUp = new PickUp();
 									pickUps.push(pickUp);
@@ -482,19 +481,22 @@ package
 								}
 							}
 							
-							if (SummonerActive == true)
-							{
-								if (enemies[k] is Skeleton)
+							if (enemies[k] is Skeleton)
 								{
-									//skeleton deaths
 									SkeletonCount--;
 									player.lives += 0.5;
+									bars.bars()
 								}
-								else if (enemies[k] is Summoner)
+							
+							if (SummonerActive)
+							{
+								if (enemies[k] is Summoner)
 								{
 									//summoner death
 									sum = false;
 									SummonerActive = false;
+									bars.bossScore = 0;
+									bars.bars();
 								}
 							}
 							
@@ -546,7 +548,7 @@ package
 				}
 			}
 		}
-		
+		private var trans:SoundTransform = new SoundTransform();
 		private function mouseDown(e:MouseEvent):void
 		{
 			if (muteSoundEffectsOff.hitTestPoint(mouseX, mouseY) || muteSoundEffectsOn.hitTestPoint(mouseX, mouseY))
@@ -559,9 +561,9 @@ package
 			if (muteMusicOff.hitTestPoint(mouseX, mouseY) || muteMusicOn.hitTestPoint(mouseX, mouseY))
 			{
 				if (musicOff == false)
-					muteMusicOff.alpha = 0, muteMusicOn.alpha = 1, soundChannel.stop(), musicOff = true;
+					muteMusicOff.alpha = 0, muteMusicOn.alpha = 1, musicChanel.stop(), musicOff = true;
 				else if (musicOff == true)
-					muteMusicOn.alpha = 0, muteMusicOff.alpha = 1, soundChannel = inGameTheme.play(0, 10), musicOff = false;
+					muteMusicOn.alpha = 0, muteMusicOff.alpha = 1, musicChanel = inGameTheme.play(0, 10), musicOff = false;
 			}
 		}
 		
@@ -595,7 +597,7 @@ package
 				{
 					playerShoots = false;
 					r = e.shooter.rotation;
-					s = 8 + (scoreboard._score / 50);
+					s = 7 + (scoreboard._score / 50);
 					dmg = (scoreboard._score / 25) + 1;
 				}
 				if (e.shooter.isMage == false)
@@ -607,7 +609,7 @@ package
 				}
 				else
 				{
-					var b:Fireball = new Fireball(r, tPos, s, dmg); //hier wordt de rotatie van Arrow berekend;
+					var b:Fireball = new Fireball(r, tPos, dmg); //hier wordt de rotatie van Arrow berekend;
 					projectile.push(b);
 					addChild(b);
 					b.scaleX = b.scaleY = 0.1;
@@ -615,12 +617,6 @@ package
 				if (!player.soundEffectsOff)
 					soundChannel = arrowShoot.play(0, 1);
 			}
-		}
-		
-		private function OnKeyDown(e:KeyboardEvent):void
-		{
-			if (e.keyCode == 32)
-				screenShake(5);
 		}
 		
 		//shake opbjects
@@ -651,8 +647,8 @@ package
 		
 		public function dead():void
 		{
+			bars.bars()
 			this.removeEventListener(Event.ENTER_FRAME, loop);
-			stage.removeEventListener(KeyboardEvent.KEY_DOWN, OnKeyDown);
 			stage.removeEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
 			for (var d:int = 0; d < enemies.length; d++)
 			{

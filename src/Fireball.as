@@ -24,7 +24,7 @@ package
 		
 		public var damage:Number;
 		
-		public function Fireball(r:Number, tPos:Point, s:Number, dmg:Number)
+		public function Fireball(r:Number, tPos:Point, dmg:Number)
 		{
 			fireBall = new FireBallArt;
 			//addChildAt(arrow,numChildren-3);

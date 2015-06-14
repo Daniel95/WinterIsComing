@@ -84,8 +84,6 @@ package
 			addChild(eastereggArt);
 			
 			creditScreen = new CreditsScreenArt();
-			creditScreen.x = 640;
-			creditScreen.y = 360;
 			
 			backButton = new BackButtonArt();
 			backButton.x = 1100;
@@ -102,16 +100,14 @@ package
 			addChild(htpButton);
 			
 			htpScreen = new howToPlayScreenArt();
-			htpScreen.x = stage.width / 2;
-			htpScreen.y = stage.height / 2;
 			
 			creditButton = new CreditsButtonArt();
 			creditButton.x = 540;
-			creditButton.y = 400;
+			creditButton.y = 450;
 			addChild(creditButton);
 			
 			startScerm = new WinterIsComingMenuArt();
-			startScerm.alpha = 2;
+			startScerm.alpha = 1.5;
 			startScerm.x = 640;
 			startScerm.y = 360;
 			addChild(startScerm);
@@ -126,14 +122,14 @@ package
 		
 		private function loop(e:Event):void
 		{
-			startScerm.alpha -= 0.02;
-			
-			if (startScerm.alpha == 0)
+			if (startScerm.alpha <= 0)
 			{
+				stage.removeEventListener(Event.ENTER_FRAME, loop);
+				stage.addEventListener(MouseEvent.CLICK, msDown);
 				removeChild(startScerm);
 				startScerm = null;
-				removeEventListener(Event.ENTER_FRAME, loop);
 			}
+			else startScerm.alpha -= 0.02;
 		}
 		
 		//checks if clicked on start screen
@@ -142,7 +138,6 @@ package
 			if (startScerm.hitTestPoint(mouseX, mouseY))
 			{
 				stage.addEventListener(Event.ENTER_FRAME, loop);
-				stage.addEventListener(MouseEvent.CLICK, msDown);
 				stage.removeEventListener(MouseEvent.CLICK, start);
 				soundChannel = menuTheme.play(0, 0.5);
 			}
@@ -185,7 +180,6 @@ package
 			if (startButton.parent && htpButton.parent && creditButton.parent && startButton.hitTestPoint(mouseX, mouseY))
 			{
 				removeEventListener(Event.ADDED_TO_STAGE, init);
-				removeChild(startButton);
 				removeChild(htpButton);
 				removeChild(creditButton);
 				removeChild(forrestMenuButton);

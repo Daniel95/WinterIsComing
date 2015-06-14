@@ -83,10 +83,8 @@ package
 			var shakeX:int;
 			var shakeY:int;
 			
-			if (Math.random() < 5)
-				shakynes = shakynes;
-			else
-				shakynes = shakynes - (shakynes * 2);
+			if (Math.random() < 5) shakynes = shakynes;
+			else shakynes = shakynes - (shakynes * 2);
 			
 			shakeX = Math.random() * shakynes;
 			shakeY = Math.random() * shakynes;
@@ -96,10 +94,8 @@ package
 			
 			var shakePos:Point;
 			
-			if (Math.random() > 0.5)
-				shakePos = movingPoint;
-			else
-				shakePos = opositeMovingPoint;
+			if (Math.random() > 0.5) shakePos = movingPoint;
+			else shakePos = opositeMovingPoint;
 			
 			return shakePos;
 		}

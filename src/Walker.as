@@ -21,11 +21,11 @@ package
 			
 			this.scaleX = this.scaleY = size = (random * 0.05) + 0.4;
 			
-			rotateSpeed += score / 200;
+			rotateSpeed += score / 250;
 			lives = Math.ceil(random * 3) + score / 40;
-			speed = (random * 2) + 0.75 + (score / 50);
+			speed = (random * 2) + 1.25 + (score / 45);
 			radius = width / 3;
-			meleeDamage = (score / 25) + 1;
+			meleeDamage = (score / 100) + 1;
 			
 			this.addEventListener(Event.ENTER_FRAME, loop);
 		}

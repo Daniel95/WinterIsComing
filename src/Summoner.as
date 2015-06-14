@@ -17,15 +17,15 @@ package
 			character = new WhiteWalkerArt();
 			this.addChild(character);
 			
-			sumLives += score / 6;
+			sumLives += score / 3;
 			
-			this.scaleX = this.scaleY = 0.3;
+			this.scaleX = this.scaleY = 0.5;
 			
 			lives = sumLives;
 			
 			radius = width / 3;
 			
-			meleeDamage = (score / 25) + 1;
+			meleeDamage = 3;
 			
 			this.addEventListener(Event.ENTER_FRAME, loop);
 		}

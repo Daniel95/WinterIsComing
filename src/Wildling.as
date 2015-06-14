@@ -26,7 +26,7 @@ package
 			
 			var randomAttack:Number = random;
 			
-			rotateSpeed += score / 200;
+			rotateSpeed += score / 250;
 			
 			if (randomAttack > 0.25) {
 				lives = Math.ceil(random * 2) + score / 40;
@@ -43,7 +43,7 @@ package
 			
 			radius = width / 3;
 			
-			meleeDamage = (score / 25) + 1;
+			meleeDamage = (score / 100) + 1;
 			
 			this.addEventListener(Event.ADDED_TO_STAGE, init);
 		}

@@ -21,13 +21,12 @@ package
 			
 			lives = 0.1 + score / 100;
 			
-			speed = 3.5 + score / 50;
+			speed = 4 + score / 50;
 			radius = width / 3;
 			
-			meleeDamage = (score / 25) + 1;
+			meleeDamage = (score / 100) + 1;
 			
 			this.scaleX = this.scaleY = size = 0.35;
-		
 		}
 		
 		override public function loop(e:Event):void
